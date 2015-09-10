@@ -1,0 +1,88 @@
+<!doctype html>
+<html ng-app='investPlusApp'>
+<head>
+	<title>Invest Plus</title>
+	<script src="/angularjs/angular.js"></script>
+	<script src="/angularjs-nvd3-directives/angularjs-nvd3-directives.js"></script>
+	<!--<script type='text/javascript' src='/d3/d3.min.js'></script>
+	<script type='text/javascript' src='/angular-chart/angular-charts.min.js'></script>
+	<script type='text/javascript' src='/charts/Chart.js'></script>-->
+	<script src="/d3/d3.js"></script>
+	<script src="/nvd3/js/nv.d3.js"></script>
+	<link rel="stylesheet" href="/nvd3/css/nv.d3.css"/>
+
+	<script type="text/javascript" src="/js/controllers/strategy.js"></script>
+	<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/investPlus.css">
+</head>
+<body>
+	<div class="container-fluid">
+		<h1 class="page-header">
+			<span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+			Invest Plus
+		</h1>
+		<div ng-controller="StrategyController as strategyCtrl">
+			<h2 class="sub-header">Market</h2>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th ng-repeat="stock in stocks">{{stock.name}}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td ng-repeat="stock in stocks">{{stock.price}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="row">
+				<div class="col-sm-3 sidebar">
+					<div class="table" ng-repeat="strategy in strategies">
+						<h3>Strategy: {{strategy.id}}</h3>
+						<table class="table table-striped table-condensed">
+							<thead>
+								<tr>
+									<th>Option</th>
+									<th>Operation</th>
+									<th>Amount</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="operation in strategy.operations">
+									<td>{{operation.option}}</td>
+									<td>
+										<select class="form-control operacao" ng-model="operation.operation" 
+											ng-options="op.value as op.operation for op in operationsList">
+									</td>
+									<td>
+										<input type="number" min="0" class="form-control stepper" ng-model="operation.amount" placeholder="Amount" size="4" step="100">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-9">
+					<pre>Results <a href="" ng-click="strategyCtrl.createValues()">link</a>{{dados}}</pre>
+					<nvd3-line-chart
+				    	data="exampleData"
+				        id="exampleId"
+				        xAxisTickFormat="xAxisTickFormatFunction()"
+				        yAxisTickFormat="yAxisTickFormatFunction()"
+				        width="550"
+				        height="350"
+				        showXAxis="true"
+				        showYAxis="true">
+				        	<svg></svg>
+				    </nvd3-line-chart>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/jquery/jquery.min.js"></script>
+	<script src="/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

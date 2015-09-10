@@ -1,0 +1,10 @@
+input.stepper {
+    padding-left: 5px;
+    width: 68px;
+    padding-right: 5px;
+}
+
+select.operacao {
+    width: 70px;
+    padding-left: 5px;
+}

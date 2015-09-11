@@ -22,6 +22,17 @@ angular.module('investPlusApp', ['nvd3ChartDirectives'])
 
 			];
 
+		strategy.toggleOptionOperation = function(id) {//$scope.toggleOptionOperation = function(id){
+			for (var i = 0; i < $scope.options.length; i++) {
+				if (id == $scope.options[i].id) {
+					$scope.options[i].estrategyOperation++;
+					if ($scope.options[i].estrategyOperation > 1) {
+						$scope.options[i].estrategyOperation = -1;
+					}
+				}
+			}
+		}
+
 		strategy.createValues = function() {
 			var data = [];
 			var stockPrice = 13.32;
@@ -43,8 +54,6 @@ angular.module('investPlusApp', ['nvd3ChartDirectives'])
 			$scope.dados = data;
 		}
 		
-
-		var stockValue = 15.32;
 		var n_points = 7;
 
 		var strategyChart = {
@@ -80,14 +89,19 @@ angular.module('investPlusApp', ['nvd3ChartDirectives'])
 		//var ctx = $("#myChart").get(0).getContext("2d");
 		//$scope.myLineChart = new Chart(ctx).Line(strategyChart);
 
-		$scope.teste = 4;
-		$scope.stocks = [
-			{id:1, name:'VALE5', price:'15.32'},
-			{id:2, name:'VALEJ15', price:'3.13'},
-			{id:3, name:'VALEJ16', price:'2.47'},
-			{id:4, name:'VALEJ17', price:'0.61'},
-			{id:5, name:'VALEJ18', price:'0.27'},
-			{id:6, name:'VALEJ19', price:'0.03'}];
+		$scope.portfolio = [
+			{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
+			{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
+		];
+
+		$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
+
+		$scope.options = [
+			{id:2, name:'VALEJ15', price: 1.61, type: 'O', priceExec: 14.49, estrategyOperation: 0, estrategyQuantity: 0},
+			{id:3, name:'VALEJ16', price: 1.04, type: 'O', priceExec: 15.49, estrategyOperation: 0, estrategyQuantity: 0},
+			{id:4, name:'VALEJ17', price: 0.57, type: 'O', priceExec: 16.49, estrategyOperation: 0, estrategyQuantity: 0},
+			{id:5, name:'VALEJ18', price: 0.32, type: 'O', priceExec: 17.49, estrategyOperation: 0, estrategyQuantity: 0}
+		];
 
 		$scope.strategies = [
 			{ id: 1, operations: [

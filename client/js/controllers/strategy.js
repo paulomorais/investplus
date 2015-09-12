@@ -3,24 +3,25 @@ angular.module('investPlusApp', ['nvd3ChartDirectives'])
 	.controller('StrategyController', function($scope) {
 		var strategy = this;
 		var SELL = 1, BUY = -1;
+
 		$scope.operationsList = [
 			{operation:'Buy', value: -1},
 			{operation:'Sell', value: 1}];
 
-		$scope.exampleData = 
-			[ 
-				{ "key": "Series 1", "values": 
-		  			[ 
-	  					[11,-1.6200000000000003],[14.5,1.8799999999999997],[16.5,1.8799999999999997],[21,6.38]
-					]
-				},
-				{ "key": "Series 2", "values": 
-		  			[ 
-	  					[11,11-13.32],[14.5,14.5-13.32],[16.5,16.5-13.32],[21,21-13.32]
-					]
-				},
+		$scope.combineResultWithStock = false;
 
-			];
+		$scope.exampleData = [ 
+			{ "key": "Series 1", "values": 
+	  			[ 
+  					[11,-1.6200000000000003],[14.5,1.8799999999999997],[16.5,1.8799999999999997],[21,6.38]
+				]
+			},
+			{ "key": "Series 2", "values": 
+	  			[ 
+  					[11,11-13.32],[14.5,14.5-13.32],[16.5,16.5-13.32],[21,21-13.32]
+				]
+			},
+		];
 
 		strategy.toggleOptionOperation = function(id) {//$scope.toggleOptionOperation = function(id){
 			for (var i = 0; i < $scope.options.length; i++) {
@@ -32,6 +33,99 @@ angular.module('investPlusApp', ['nvd3ChartDirectives'])
 				}
 			}
 		}
+
+		strategy.createStrategy = function() {//$scope.toggleOptionOperation = function(id){
+			var newStrategy = {id: $scope.strategies.length+1, operations: []};
+			var op = 1;
+			for (var i = 0; i < $scope.options.length; i++) {
+				if ($scope.options[i].selected) {
+					newStrategy.operations.push(
+						{id: $scope.options[i].id, option: $scope.options[i].name, price: $scope.options[i].price,
+							priceExec: $scope.options[i].priceExec, quantity: $scope.stockSelected.quantity, operation: op});
+					op *= -1;
+				}
+			}
+			$scope.strategies.push(newStrategy);
+		}
+
+		strategy.updateChart = function() {
+			//$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
+			$scope.exampleData = []; 
+			var minVal = Math.round($scope.stockSelected.price * 0.85);
+			var maxVal = Math.round($scope.stockSelected.price * 1.30);
+			//Define chart range
+			for (var i = 0; i < $scope.strategies.length; i++) {
+				for (var j = 0; j < $scope.strategies[i].operations.length; j++) {
+					var priceExec = $scope.strategies[i].operations[j].priceExec;
+					if (priceExec * 0.85 < minVal){
+						minVal = Math.round(priceExec * 0.85);
+					}
+					if (priceExec * 1.30 > maxVal){
+						maxVal = Math.round(priceExec * 1.30);
+					}
+				}
+			}
+			//create curve data
+			//reference curve -> Result without no option strategy operation
+			var stockValue = $scope.stockSelected.price;
+			var data = [ [minVal/stockValue-1, (minVal - stockValue)/stockValue], 
+						 [maxVal/stockValue-1, (maxVal - stockValue)/stockValue]];
+			$scope.exampleData.push({key: "Reference curve", values: data});
+			//strategies curves
+			var stockHoldingValue = stockValue * $scope.stockSelected.quantity;
+			for (var i = 0; i < $scope.strategies.length; i++) {
+				var dados = createCurveData(minVal, maxVal, stockHoldingValue, $scope.strategies[i].operations);
+				$scope.exampleData.push({key: "strategy " + $scope.exampleData.length, values: dados});
+			}
+
+// { "key": "Series 1", "values": 
+// 	[ 
+// 		[11,-1.6200000000000003],[14.5,1.8799999999999997],[16.5,1.8799999999999997],[21,6.38]
+// 	]
+// },
+		}
+
+		var createCurveData = function(minVal, maxVal, referenceGain, operations) {
+			var points = [minVal];
+			var data = [];
+			//var pointsRef = [(minVal - refPrice)/refPrice];
+
+			//define curve points
+			for (var i = 0; i < operations.length; i++) {
+				points.push(operations[i].priceExec);
+			}
+			points.push(maxVal);
+			//define x,y values for each point
+			for (var i = 0; i < points.length; i++) {
+				var x = points[i];
+				var y = 0;
+				for (var j = 0; j < operations.length; j++) {
+					var x_oper = operations[j].priceExec;
+					//Gain from option premium 
+					y += operations[j].price * operations[j].quantity * operations[j].operation;
+					//add result of execution if occured
+					if (x > x_oper){
+						y += (operations[j].priceExec - x) * operations[j].quantity * operations[j].operation;
+					}
+					if ($scope.combineResultWithStock){
+						y += (x - $scope.stockSelected.price) * $scope.stockSelected.quantity;
+					}
+				}
+				data.push([x/$scope.stockSelected.price-1, y / referenceGain]);
+			};
+			return data;
+		}
+
+		// [ { "id": 1, "operations": [
+		//       { "id": 2, "option": "VALEJ15", "price": 1.61, "quantity": 0, "operation": 0 },
+		//       { "id": 4, "option": "VALEJ17", "price": 0.57, "quantity": 0, "operation": 0 }
+		//     ] }, 
+		//   { "id": 2, "operations": [
+		//       { "id": 4, "option": "VALEJ17", "price": 0.57, "quantity": 0, "operation": 0 },
+		//       { "id": 5, "option": "VALEJ18", "price": 0.32, "quantity": 0, "operation": 0 }
+		//     ]
+		//   }
+		// ];
 
 		strategy.createValues = function() {
 			var data = [];
@@ -97,21 +191,14 @@ angular.module('investPlusApp', ['nvd3ChartDirectives'])
 		$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
 
 		$scope.options = [
-			{id:2, name:'VALEJ15', price: 1.61, type: 'O', priceExec: 14.49, estrategyOperation: 0, estrategyQuantity: 0},
-			{id:3, name:'VALEJ16', price: 1.04, type: 'O', priceExec: 15.49, estrategyOperation: 0, estrategyQuantity: 0},
-			{id:4, name:'VALEJ17', price: 0.57, type: 'O', priceExec: 16.49, estrategyOperation: 0, estrategyQuantity: 0},
-			{id:5, name:'VALEJ18', price: 0.32, type: 'O', priceExec: 17.49, estrategyOperation: 0, estrategyQuantity: 0}
+			{id:2, name:'VALEJ15', price: 1.61, type: 'O', priceExec: 14.49, selected: false},
+			{id:3, name:'VALEJ16', price: 1.04, type: 'O', priceExec: 15.49, selected: false},
+			{id:4, name:'VALEJ17', price: 0.57, type: 'O', priceExec: 16.49, selected: false},
+			{id:5, name:'VALEJ18', price: 0.32, type: 'O', priceExec: 17.49, selected: false}
 		];
 
-		$scope.strategies = [
-			{ id: 1, operations: [
-				{id:4, option:'VALEJ16',price:'2.47',amount:500,operation:SELL},
-				{id:5, option:'VALEJ17',price:'0.61',amount:500,operation:BUY}]
-			},
-			{ id: 2, operations: [
-				{id:4, option:'VALEJ17',price:'0.61',amount:800,operation:SELL},
-				{id:5, option:'VALEJ18',price:'0.27',amount:800,operation:BUY}]
-			}];
+		$scope.strategies = [];
+
 		$scope.config = {
 			title: 'sdasdasd',
 			tooltips: true,

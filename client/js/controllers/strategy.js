@@ -26,7 +26,10 @@ app.controller('StrategyController', function($scope) {
                 tooltipHide: function(e){ console.log("tooltipHide"); }
             },
             xAxis: {
-                axisLabel: 'Stock Price Range(%)'
+                axisLabel: 'Stock Price Range(%)',
+                tickFormat: function(d){
+                    return d3.format('.0%')(d);
+                }
             },
             yAxis: {
                 axisLabel: 'Strategy Result (%)',

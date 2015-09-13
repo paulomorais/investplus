@@ -9,7 +9,7 @@ app.controller('StrategyController', function($scope) {
 	$scope.optionsChart = {
         chart: {
             type: 'lineChart',
-            height: 450,
+            height: 350,
             margin : {
                 top: 20,
                 right: 20,
@@ -26,12 +26,12 @@ app.controller('StrategyController', function($scope) {
                 tooltipHide: function(e){ console.log("tooltipHide"); }
             },
             xAxis: {
-                axisLabel: 'Time (ms)'
+                axisLabel: 'Stock Price Range(%)'
             },
             yAxis: {
-                axisLabel: 'Voltage (v)',
+                axisLabel: 'Strategy Result (%)',
                 tickFormat: function(d){
-                    return d3.format('.02f')(d);
+                    return d3.format('.0%')(d);
                 },
                 axisLabelDistance: 30
             },
@@ -41,64 +41,9 @@ app.controller('StrategyController', function($scope) {
         },
         title: {
             enable: true,
-            text: 'Title for Line Chart'
-        },
-        subtitle: {
-            enable: true,
-            text: 'Subtitle for simple line chart. This is the most basic form of Bootstrap: precompiled files for quick drop-in usage in nearly any web project.',
-            css: {
-                'text-align': 'center',
-                'margin': '10px 13px 0px 7px'
-            }
-        },
-        caption: {
-            enable: true,
-            html: '<b>Figure 1.</b> The Bootstrap source code download includes the precompiled CSS, JavaScript, and font assets, along with source Less, JavaScript, and documentation.',
-            css: {
-                'text-align': 'justify',
-                'margin': '10px 13px 0px 7px'
-            }
+            text: 'Strategies Comparison'
         }
     };
-
-    $scope.dataChart = sinAndCos();
-
-    /*Random Data Generator */
-    function sinAndCos() {
-        var sin = [],sin2 = [],
-            cos = [];
-
-        //Data is represented as an array of {x,y} pairs.
-        for (var i = 0; i < 100; i++) {
-            sin.push({x: i, y: Math.sin(i/10)});
-            sin2.push({x: i, y: i % 10 == 5 ? null : Math.sin(i/10) *0.25 + 0.5});
-            cos.push({x: i, y: .5 * Math.cos(i/10+ 2) + Math.random() / 10});
-        }
-
-        //Line chart data should be sent as an array of series objects.
-        return [
-            {
-                values: sin,      //values - represents the array of {x,y} data points
-                key: 'Sine Wave', //key  - the name of the series.
-                color: '#ff7f0e'  //color - optional: choose your own line color.
-            },
-            {
-                values: cos,
-                key: 'Cosine Wave',
-                color: '#2ca02c'
-            },
-            {
-                values: sin2,
-                key: 'Another sine wave',
-                color: '#7777ff',
-                area: true      //area - set to true if you want this line to turn into a filled area chart.
-            }
-        ];
-    };
-
-
-
-
 
 	$scope.operationsList = [
 		{operation:'Buy', value: -1},
@@ -187,29 +132,48 @@ app.controller('StrategyController', function($scope) {
 		var stockValue = $scope.stockSelected.price;
 		//create curves
 		//reference curve -> Result without no option strategy operation
-		var data = [ [minVal/stockValue-1, (minVal - stockValue)/stockValue], 
-					 [maxVal/stockValue-1, (maxVal - stockValue)/stockValue]];
-		$scope.strategyChartData.push({key: "Reference curve", values: data});
+		var data = [ {x: minVal/stockValue-1, y: (minVal - stockValue)/stockValue}, 
+					 {x: maxVal/stockValue-1, y: (maxVal - stockValue)/stockValue} ];
+		$scope.strategyChartData.push({key: "Reference curve", values: data, color: '#000000'});
 		//reference curve -> ZERO LINE
-		data = [ [minVal/stockValue-1, 0], [maxVal/stockValue-1, 0]];
-		$scope.strategyChartData.push({key: "ZERO", values: data});
+		data = [ {x: minVal/stockValue-1, y: 0}, {x: maxVal/stockValue-1, y: 0}];
+		$scope.strategyChartData.push({key: "ZERO", values: data, color: '#000000'});
 		//reference curve -> Vertical @ ZERO
-		data = [ [0, (minVal - stockValue)/stockValue], [0, (maxVal - stockValue)/stockValue]];
-		$scope.strategyChartData.push({key: "Vertical", values: data});
+		data = [ {x: 0, y: (minVal - stockValue)/stockValue}, {x: 0, y: (maxVal - stockValue)/stockValue}];
+		$scope.strategyChartData.push({key: "Vertical", values: data, color: '#000000'});
 		//reference curve -> Valor Simulado
 		
-		data = [ [($scope.stockValueSimulated - stockValue)/stockValue, (minVal - stockValue)/stockValue], 
-			[($scope.stockValueSimulated - stockValue)/stockValue, (maxVal - stockValue)/stockValue]];
-		$scope.strategyChartData.push({key: "Stock Price Simulated", values: data});
+		data = [ {x: ($scope.stockValueSimulated - stockValue)/stockValue, y: (minVal - stockValue)/stockValue}, 
+				 {x: ($scope.stockValueSimulated - stockValue)/stockValue, y: (maxVal - stockValue)/stockValue}];
+		$scope.strategyChartData.push({key: "Stock Price Simulated", values: data, color: '#aa3333'});
 
 		//strategies curves
 		var stockHoldingValue = stockValue * $scope.stockSelected.quantity;
 		for (var i = 0; i < $scope.strategies.length; i++) {
 			if ($scope.strategies[i].visibility == 'show') {
 				var dados = createCurveData(minVal, maxVal, stockHoldingValue, $scope.strategies[i].operations);
-				$scope.strategyChartData.push({key: "strategy " + $scope.strategyChartData.length, values: dados});
+				$scope.strategyChartData.push({key: "strategy " + $scope.strategyChartData.length, values: dados, color: '#FF0000'});
 			}
 		}
+
+		 // return [
+   //              {
+   //                  values: sin,      //values - represents the array of {x,y} data points
+   //                  key: 'Sine Wave', //key  - the name of the series.
+   //                  color: '#ff7f0e'  //color - optional: choose your own line color.
+   //              },
+   //              {
+   //                  values: cos,
+   //                  key: 'Cosine Wave',
+   //                  color: '#2ca02c'
+   //              },
+   //              {
+   //                  values: sin2,
+   //                  key: 'Another sine wave',
+   //                  color: '#7777ff',
+   //                  area: true      //area - set to true if you want this line to turn into a filled area chart.
+   //              }
+   //          ];
 	}
 
 	var createCurveData = function(minVal, maxVal, referenceGain, operations) {
@@ -238,7 +202,7 @@ app.controller('StrategyController', function($scope) {
 			if ($scope.combineResultWithStock){
 				y += (x - $scope.stockSelected.price) * $scope.stockSelected.quantity;
 			}
-			data.push([x/$scope.stockSelected.price-1, y / referenceGain]);
+			data.push({x: x/$scope.stockSelected.price-1, y: y / referenceGain});
 		};
 		return data;
 	}

@@ -1,219 +1,248 @@
 
-angular.module('investPlusApp', ['nvd3ChartDirectives'])
-	.controller('StrategyController', function($scope) {
-		var strategy = this;
-		var SELL = 1, BUY = -1;
+var app = angular.module('investPlusApp', ['nvd3']);
 
-		$scope.operationsList = [
-			{operation:'Buy', value: -1},
-			{operation:'Sell', value: 1}];
+app.controller('StrategyController', function($scope) {
+	var strategy = this;
+	var SELL = 1, BUY = -1;
+	var minRangeRatio = 0.9, maxRangeRatio = 1.2;
 
-		$scope.combineResultWithStock = false;
+	$scope.optionsChart = {
+        chart: {
+            type: 'lineChart',
+            height: 450,
+            margin : {
+                top: 20,
+                right: 20,
+                bottom: 40,
+                left: 55
+            },
+            x: function(d){ return d.x; },
+            y: function(d){ return d.y; },
+            useInteractiveGuideline: true,
+            dispatch: {
+                stateChange: function(e){ console.log("stateChange"); },
+                changeState: function(e){ console.log("changeState"); },
+                tooltipShow: function(e){ console.log("tooltipShow"); },
+                tooltipHide: function(e){ console.log("tooltipHide"); }
+            },
+            xAxis: {
+                axisLabel: 'Time (ms)'
+            },
+            yAxis: {
+                axisLabel: 'Voltage (v)',
+                tickFormat: function(d){
+                    return d3.format('.02f')(d);
+                },
+                axisLabelDistance: 30
+            },
+            callback: function(chart){
+                console.log("!!! lineChart callback !!!");
+            }
+        },
+        title: {
+            enable: true,
+            text: 'Title for Line Chart'
+        },
+        subtitle: {
+            enable: true,
+            text: 'Subtitle for simple line chart. This is the most basic form of Bootstrap: precompiled files for quick drop-in usage in nearly any web project.',
+            css: {
+                'text-align': 'center',
+                'margin': '10px 13px 0px 7px'
+            }
+        },
+        caption: {
+            enable: true,
+            html: '<b>Figure 1.</b> The Bootstrap source code download includes the precompiled CSS, JavaScript, and font assets, along with source Less, JavaScript, and documentation.',
+            css: {
+                'text-align': 'justify',
+                'margin': '10px 13px 0px 7px'
+            }
+        }
+    };
 
-		$scope.exampleData = [ 
-			{ "key": "Series 1", "values": 
-	  			[ 
-  					[11,-1.6200000000000003],[14.5,1.8799999999999997],[16.5,1.8799999999999997],[21,6.38]
-				]
-			},
-			{ "key": "Series 2", "values": 
-	  			[ 
-  					[11,11-13.32],[14.5,14.5-13.32],[16.5,16.5-13.32],[21,21-13.32]
-				]
-			},
-		];
+    $scope.dataChart = sinAndCos();
 
-		strategy.toggleOptionOperation = function(id) {//$scope.toggleOptionOperation = function(id){
-			for (var i = 0; i < $scope.options.length; i++) {
-				if (id == $scope.options[i].id) {
-					$scope.options[i].estrategyOperation++;
-					if ($scope.options[i].estrategyOperation > 1) {
-						$scope.options[i].estrategyOperation = -1;
-					}
+    /*Random Data Generator */
+    function sinAndCos() {
+        var sin = [],sin2 = [],
+            cos = [];
+
+        //Data is represented as an array of {x,y} pairs.
+        for (var i = 0; i < 100; i++) {
+            sin.push({x: i, y: Math.sin(i/10)});
+            sin2.push({x: i, y: i % 10 == 5 ? null : Math.sin(i/10) *0.25 + 0.5});
+            cos.push({x: i, y: .5 * Math.cos(i/10+ 2) + Math.random() / 10});
+        }
+
+        //Line chart data should be sent as an array of series objects.
+        return [
+            {
+                values: sin,      //values - represents the array of {x,y} data points
+                key: 'Sine Wave', //key  - the name of the series.
+                color: '#ff7f0e'  //color - optional: choose your own line color.
+            },
+            {
+                values: cos,
+                key: 'Cosine Wave',
+                color: '#2ca02c'
+            },
+            {
+                values: sin2,
+                key: 'Another sine wave',
+                color: '#7777ff',
+                area: true      //area - set to true if you want this line to turn into a filled area chart.
+            }
+        ];
+    };
+
+
+
+
+
+	$scope.operationsList = [
+		{operation:'Buy', value: -1},
+		{operation:'Sell', value: 1}];
+
+	$scope.combineResultWithStock = false;
+
+	$scope.strategyChartData = [ ];
+	$scope.strategyChartOptions = { /* JSON data */ };
+
+	$scope.portfolio = [
+		{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
+		{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
+	];
+
+	$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
+
+	$scope.options = [
+		{id:2, name:'VALEJ15', premium: 1.61, type: 'O', priceExec: 14.49, selected: false},
+		{id:3, name:'VALEJ16', premium: 1.04, type: 'O', priceExec: 15.49, selected: false},
+		{id:4, name:'VALEJ17', premium: 0.57, type: 'O', priceExec: 16.49, selected: false},
+		{id:5, name:'VALEJ18', premium: 0.32, type: 'O', priceExec: 17.49, selected: false}
+	];
+
+	$scope.strategies = [ {"id":1, "visibility":'show',"operations":
+		[
+			{"id":4,"option":"VALEJ17","premium":0.57,"priceExec":16.49,"quantity":2800,"operation":1},
+			{"id":5,"option":"VALEJ18","premium":0.32,"priceExec":17.49,"quantity":2300,"operation":-1}
+		]
+	}];
+
+	strategy.toggleOptionOperation = function(id) {//$scope.toggleOptionOperation = function(id){
+		for (var i = 0; i < $scope.options.length; i++) {
+			if (id == $scope.options[i].id) {
+				$scope.options[i].estrategyOperation++;
+				if ($scope.options[i].estrategyOperation > 1) {
+					$scope.options[i].estrategyOperation = -1;
 				}
 			}
 		}
+	}
 
-		strategy.createStrategy = function() {//$scope.toggleOptionOperation = function(id){
-			var newStrategy = {id: $scope.strategies.length+1, operations: []};
-			var op = 1;
-			for (var i = 0; i < $scope.options.length; i++) {
-				if ($scope.options[i].selected) {
-					newStrategy.operations.push(
-						{id: $scope.options[i].id, option: $scope.options[i].name, price: $scope.options[i].price,
-							priceExec: $scope.options[i].priceExec, quantity: $scope.stockSelected.quantity, operation: op});
-					op *= -1;
+	strategy.toggleStrategy = function(strategy) {
+		if (strategy.visibility != 'hidden') {
+			strategy.visibility = 'hidden';
+		} else {
+			strategy.visibility = 'show';
+		}
+		this.updateChart();
+	}
+
+	strategy.createStrategy = function() {//$scope.toggleOptionOperation = function(id){
+		var newStrategy = {id: $scope.strategies.length+1, visibility:'show', operations: []};
+		var op = 1;
+		for (var i = 0; i < $scope.options.length; i++) {
+			if ($scope.options[i].selected) {
+				newStrategy.operations.push(
+					{id: $scope.options[i].id, option: $scope.options[i].name, premium: $scope.options[i].premium,
+						priceExec: $scope.options[i].priceExec, quantity: $scope.stockSelected.quantity, operation: op});
+				op *= -1;
+			}
+		}
+		$scope.strategies.push(newStrategy);
+		this.updateChart();
+	}
+
+	$scope.stockValueSimulated = 16.35; 
+
+	strategy.updateChart = function() {
+		//$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
+		$scope.strategyChartData = []; 
+		var minVal = Math.round($scope.stockSelected.price * minRangeRatio);
+		var maxVal = Math.round($scope.stockSelected.price * maxRangeRatio);
+		//Define chart range
+		for (var i = 0; i < $scope.strategies.length; i++) {
+			for (var j = 0; j < $scope.strategies[i].operations.length; j++) {
+				var priceExec = $scope.strategies[i].operations[j].priceExec;
+				if (priceExec * minRangeRatio < minVal){
+					minVal = Math.round(priceExec * minRangeRatio);
+				}
+				if (priceExec * maxRangeRatio > maxVal){
+					maxVal = Math.round(priceExec * maxRangeRatio);
 				}
 			}
-			$scope.strategies.push(newStrategy);
 		}
-
-		strategy.updateChart = function() {
-			//$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
-			$scope.exampleData = []; 
-			var minVal = Math.round($scope.stockSelected.price * 0.85);
-			var maxVal = Math.round($scope.stockSelected.price * 1.30);
-			//Define chart range
-			for (var i = 0; i < $scope.strategies.length; i++) {
-				for (var j = 0; j < $scope.strategies[i].operations.length; j++) {
-					var priceExec = $scope.strategies[i].operations[j].priceExec;
-					if (priceExec * 0.85 < minVal){
-						minVal = Math.round(priceExec * 0.85);
-					}
-					if (priceExec * 1.30 > maxVal){
-						maxVal = Math.round(priceExec * 1.30);
-					}
-				}
-			}
-			//create curve data
-			//reference curve -> Result without no option strategy operation
-			var stockValue = $scope.stockSelected.price;
-			var data = [ [minVal/stockValue-1, (minVal - stockValue)/stockValue], 
-						 [maxVal/stockValue-1, (maxVal - stockValue)/stockValue]];
-			$scope.exampleData.push({key: "Reference curve", values: data});
-			//strategies curves
-			var stockHoldingValue = stockValue * $scope.stockSelected.quantity;
-			for (var i = 0; i < $scope.strategies.length; i++) {
-				var dados = createCurveData(minVal, maxVal, stockHoldingValue, $scope.strategies[i].operations);
-				$scope.exampleData.push({key: "strategy " + $scope.exampleData.length, values: dados});
-			}
-
-// { "key": "Series 1", "values": 
-// 	[ 
-// 		[11,-1.6200000000000003],[14.5,1.8799999999999997],[16.5,1.8799999999999997],[21,6.38]
-// 	]
-// },
-		}
-
-		var createCurveData = function(minVal, maxVal, referenceGain, operations) {
-			var points = [minVal];
-			var data = [];
-			//var pointsRef = [(minVal - refPrice)/refPrice];
-
-			//define curve points
-			for (var i = 0; i < operations.length; i++) {
-				points.push(operations[i].priceExec);
-			}
-			points.push(maxVal);
-			//define x,y values for each point
-			for (var i = 0; i < points.length; i++) {
-				var x = points[i];
-				var y = 0;
-				for (var j = 0; j < operations.length; j++) {
-					var x_oper = operations[j].priceExec;
-					//Gain from option premium 
-					y += operations[j].price * operations[j].quantity * operations[j].operation;
-					//add result of execution if occured
-					if (x > x_oper){
-						y += (operations[j].priceExec - x) * operations[j].quantity * operations[j].operation;
-					}
-					if ($scope.combineResultWithStock){
-						y += (x - $scope.stockSelected.price) * $scope.stockSelected.quantity;
-					}
-				}
-				data.push([x/$scope.stockSelected.price-1, y / referenceGain]);
-			};
-			return data;
-		}
-
-		// [ { "id": 1, "operations": [
-		//       { "id": 2, "option": "VALEJ15", "price": 1.61, "quantity": 0, "operation": 0 },
-		//       { "id": 4, "option": "VALEJ17", "price": 0.57, "quantity": 0, "operation": 0 }
-		//     ] }, 
-		//   { "id": 2, "operations": [
-		//       { "id": 4, "option": "VALEJ17", "price": 0.57, "quantity": 0, "operation": 0 },
-		//       { "id": 5, "option": "VALEJ18", "price": 0.32, "quantity": 0, "operation": 0 }
-		//     ]
-		//   }
-		// ];
-
-		strategy.createValues = function() {
-			var data = [];
-			var stockPrice = 13.32;
-			var optionExecPriceSell = 14.50;
-			var optionExecPriceBuy = 16.50;
-			var optionPrice1 = 0.90;
-			var optionPrice2 = 0.20;
-			var minVal = Math.round(stockPrice * 0.85);
-			var maxVal = Math.round(optionExecPriceBuy * 1.30);
-			//x0 = minVal, x1 = optionExecPriceSell, x2 = optionExecPriceBuy, x3 = maxVal
-			//f(x) -> x < optionExecPriceSell: optionPrice1 - optionPrice2 - (stockPrice - x)
-			data.push([minVal, optionPrice1 - optionPrice2 - (stockPrice - minVal)]);
-			data.push([optionExecPriceSell, optionPrice1 - optionPrice2 - (stockPrice - optionExecPriceSell)]);
-			//f(x) -> x > optionExecPriceSell &
-			//		  x < optionExecPriceBuy: optionPrice1 - (x - optionExecPriceSell) - optionPrice2 - (stockPrice - x)
-			data.push([optionExecPriceBuy, optionPrice1 - (optionExecPriceBuy - optionExecPriceSell) - optionPrice2 - (stockPrice - optionExecPriceBuy)]);
-			//f(x) -> x > optionExecPriceBuy: optionPrice1 - (x - optionExecPriceSell) - optionPrice2 + (x - optionExecPriceBuy) - (stockPrice - x)
-			data.push([maxVal, optionPrice1 - (maxVal - optionExecPriceSell) - optionPrice2 + (maxVal - optionExecPriceBuy) - (stockPrice - maxVal)]);
-			$scope.dados = data;
-		}
+		var stockValue = $scope.stockSelected.price;
+		//create curves
+		//reference curve -> Result without no option strategy operation
+		var data = [ [minVal/stockValue-1, (minVal - stockValue)/stockValue], 
+					 [maxVal/stockValue-1, (maxVal - stockValue)/stockValue]];
+		$scope.strategyChartData.push({key: "Reference curve", values: data});
+		//reference curve -> ZERO LINE
+		data = [ [minVal/stockValue-1, 0], [maxVal/stockValue-1, 0]];
+		$scope.strategyChartData.push({key: "ZERO", values: data});
+		//reference curve -> Vertical @ ZERO
+		data = [ [0, (minVal - stockValue)/stockValue], [0, (maxVal - stockValue)/stockValue]];
+		$scope.strategyChartData.push({key: "Vertical", values: data});
+		//reference curve -> Valor Simulado
 		
-		var n_points = 7;
+		data = [ [($scope.stockValueSimulated - stockValue)/stockValue, (minVal - stockValue)/stockValue], 
+			[($scope.stockValueSimulated - stockValue)/stockValue, (maxVal - stockValue)/stockValue]];
+		$scope.strategyChartData.push({key: "Stock Price Simulated", values: data});
 
-		var strategyChart = {
-    		labels: [1, 2, 3, 4, 5, 6, 9],
-    		datasets: [
-		        {
-		            label: "My First dataset",
-		            fillColor: "rgba(220,220,220,0.2)",
-		            strokeColor: "rgba(220,220,220,1)",
-		            pointColor: "rgba(220,220,220,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(220,220,220,1)",
-		            data: [65, 59, 80, 81, 56, 55, 40]
-		        },
-		        {
-		            label: "My Second dataset",
-		            fillColor: "rgba(151,187,205,0.2)",
-		            strokeColor: "rgba(151,187,205,1)",
-		            pointColor: "rgba(151,187,205,1)",
-		            pointStrokeColor: "#fff",
-		            pointHighlightFill: "#fff",
-		            pointHighlightStroke: "rgba(151,187,205,1)",
-		            data: [28, 48, 40, 19, 86, 27, 90]
-		        }
-    		]
-		};
-
-		//Chart.defaults.global.scaleBeginAtZero = true;
-		//Chart.defaults.global.animation = false;
-		//Chart.defaults.global.scaleOverride = true;
-		//Chart.defaults.global.scaleSteps = 7;
-		//var ctx = $("#myChart").get(0).getContext("2d");
-		//$scope.myLineChart = new Chart(ctx).Line(strategyChart);
-
-		$scope.portfolio = [
-			{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
-			{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
-		];
-
-		$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
-
-		$scope.options = [
-			{id:2, name:'VALEJ15', price: 1.61, type: 'O', priceExec: 14.49, selected: false},
-			{id:3, name:'VALEJ16', price: 1.04, type: 'O', priceExec: 15.49, selected: false},
-			{id:4, name:'VALEJ17', price: 0.57, type: 'O', priceExec: 16.49, selected: false},
-			{id:5, name:'VALEJ18', price: 0.32, type: 'O', priceExec: 17.49, selected: false}
-		];
-
-		$scope.strategies = [];
-
-		$scope.config = {
-			title: 'sdasdasd',
-			tooltips: true,
-			labels: false,
-			mouseover: function() {},
-			mouseout: function() {},
-			click: function() {},
-			legend: {
-				display: true,
-				//could be 'left, right'
-				position: 'left'
-			},
-			innerRadius: 0, // applicable on pieCharts, can be a percentage like '50%'
-			lineLegend: 'lineEnd' // can be also 'traditional'
+		//strategies curves
+		var stockHoldingValue = stockValue * $scope.stockSelected.quantity;
+		for (var i = 0; i < $scope.strategies.length; i++) {
+			if ($scope.strategies[i].visibility == 'show') {
+				var dados = createCurveData(minVal, maxVal, stockHoldingValue, $scope.strategies[i].operations);
+				$scope.strategyChartData.push({key: "strategy " + $scope.strategyChartData.length, values: dados});
+			}
 		}
+	}
+
+	var createCurveData = function(minVal, maxVal, referenceGain, operations) {
+		var points = [minVal];
+		var data = [];
+		//var pointsRef = [(minVal - refPrice)/refPrice];
+
+		//define curve points
+		for (var i = 0; i < operations.length; i++) {
+			points.push(operations[i].priceExec);
+		}
+		points.push(maxVal);
+		//define x,y values for each point
+		for (var i = 0; i < points.length; i++) {
+			var x = points[i];
+			var y = 0;
+			for (var j = 0; j < operations.length; j++) {
+				var x_oper = operations[j].priceExec;
+				//Gain from option premium 
+				y += operations[j].premium * operations[j].quantity * operations[j].operation;
+				//add result of execution if occured
+				if (x > x_oper){
+					y += (operations[j].priceExec - x) * operations[j].quantity * operations[j].operation;
+				}
+			}
+			if ($scope.combineResultWithStock){
+				y += (x - $scope.stockSelected.price) * $scope.stockSelected.quantity;
+			}
+			data.push([x/$scope.stockSelected.price-1, y / referenceGain]);
+		};
+		return data;
+	}
+
 });
 
 

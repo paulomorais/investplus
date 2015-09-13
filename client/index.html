@@ -1,18 +1,30 @@
 <!doctype html>
 <html ng-app='investPlusApp'>
 <head>
+	<meta charset="utf-8">
 	<title>Invest Plus</title>
-	<script src="/angularjs/angular.js"></script>
-	<script src="/angularjs-nvd3-directives/angularjs-nvd3-directives.js"></script>
-	<!--<script type='text/javascript' src='/d3/d3.min.js'></script>
+	<script src="/bower_components/angular/angular.js"></script>
+	<!--<script src="/angularjs-nvd3-directives/angularjs-nvd3-directives.js"></script>
+
+
+	<script type='text/javascript' src='/d3/d3.min.js'></script>
 	<script type='text/javascript' src='/angular-chart/angular-charts.min.js'></script>
-	<script type='text/javascript' src='/charts/Chart.js'></script>-->
-	<script src="/d3/d3.js"></script>
-	<script src="/nvd3/js/nv.d3.js"></script>
-	<link rel="stylesheet" href="/nvd3/css/nv.d3.css"/>
+	<script type='text/javascript' src='/charts/Chart.js'></script>
+
+
+<script src="bower_components/d3/d3.js"></script>
+<script src="bower_components/nvd3/nv.d3.js"></script>
+<script src="bower_components/angular-nvd3/dist/angular-nvd3.js"></script>
+<link rel="stylesheet" href="bower_components/nvd3/nv.d3.css">
+
+	-->
+	<script src="/bower_components/d3/d3.js"></script>
+	<script src="/bower_components/nvd3/build/nv.d3.js"></script>
+	<script src="/bower_components/angular-nvd3/dist/angular-nvd3.js"></script>
+	<link rel="stylesheet" href="/bower_components/nvd3/build/nv.d3.css">
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
 
 	<script type="text/javascript" src="/js/controllers/strategy.js"></script>
-	<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/investPlus.css">
 </head>
 <body>
@@ -20,53 +32,60 @@
 		<div ng-controller="StrategyController as strategyCtrl">
 			<div class="row">
 				<div class="col-sm-3">
-					<h2 class="sub-header">Portfolio</h2>
-					<table class="table table-bordered table-hover">
-						<thead>
-							<tr>
-								<th>Stock</th>
-								<th>Price</th>
-								<th>Quantity</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="stock in portfolio" class="{{stock.selected == true ? 'success' : ''}}"
-								ng-click="stock.selected = !stock.selected">
-								<td>{{stock.name}}</td>
-								<td>{{stock.price}}</td>
-								<td>{{stock.quantity}}</td>
-							</tr>
-						</tbody>
-					</table>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Portfolio
+						</div>
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<th class="text-center">Stock</th>
+									<th class="text-center">Price</th>
+									<th class="text-center">Quantity</th>
+									<th class="text-center">Value</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="stock in portfolio" class="{{stock.selected == true ? 'success' : ''}}"
+									ng-click="stock.selected = !stock.selected">
+									<td>{{stock.name}}</td>
+									<td class="text-center">{{stock.price}}</td>
+									<td class="text-center">{{stock.quantity}}</td>
+									<td class="text-right">{{stock.price * stock.quantity | number : 2}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 				<div class="col-sm-8">
-					<h2 class="sub-header">Select Options</h2>
-					<table class="table table-bordered table-condensed">
-						<thead>
-							<tr>
-								<th>Stock</th>
-								<th>Price</th>
-								<th>Exec Price</th>
-								<th>% Stock</th>
-								<th>% Exec</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="option in options" ng-click="option.selected = !option.selected"
-									class="{{option.selected == true ? 'success' : ''}}">
-								<td>{{option.name}}</td>
-								<td>{{option.price}}</td>
-								<td>{{option.priceExec}}</td>
-								<td>{{100 * option.price / stockSelected.price | number:1}}</td>
-								<td>{{100 * (option.priceExec - stockSelected.price) / stockSelected.price | number:1}}</td>
-							</tr>
-						</tbody>
-					</table>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Select Options...
+						</div>
+						<table class="table table-bordered table-condensed">
+							<thead>
+								<tr>
+									<th>Stock</th>
+									<th>Price</th>
+									<th>Exec Price</th>
+									<th>% Stock</th>
+									<th>% Exec</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="option in options" ng-click="option.selected = !option.selected"
+										class="{{option.selected == true ? 'success' : ''}}">
+									<td>{{option.name}}</td>
+									<td class="text-center">{{option.premium}}</td>
+									<td class="text-center">{{option.priceExec}}</td>
+									<td class="text-center">{{100 * option.premium / stockSelected.price | number:1}}</td>
+									<td class="text-center">{{100 * (option.priceExec - stockSelected.price) / stockSelected.price | number:1}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 					<button type="button" class="btn btn-default" ng-click="strategyCtrl.createStrategy()">
-					  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Strategy
-					</button>
-					<button type="button" class="btn btn-default" ng-click="strategyCtrl.updateChart()">
-					  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Update Chart
+						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Strategy...
 					</button>
 				</div>
 				<div class="col-sm-1">
@@ -74,56 +93,62 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-3 sidebar">
+				<div class="col-sm-5 sidebar">
 					<div class="table" ng-repeat="strategy in strategies">
-						<h3>Strategy: {{strategy.id}}</h3>
-						<table class="table table-striped table-condensed">
-							<thead>
-								<tr>
-									<th>Option</th>
-									<th>Operation</th>
-									<th>Amount</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="operation in strategy.operations">
-									<td>{{operation.option}}</td>
-									<td>
-										<select class="form-control operacao" ng-model="operation.operation" 
-											ng-options="op.value as op.operation for op in operationsList">
-									</td>
-									<td>
-										<input type="number" min="0" class="form-control stepper" ng-model="operation.quantity" placeholder="Amount" size="4" step="100">
-									</td>
-								</tr>
-							</tbody>
-						</table>
+						<div class="panel panel-default">
+							<div class="panel-heading" ng-click="strategyCtrl.toggleStrategy(strategy)">
+								Strategy: {{strategy.id}}
+							</div>
+							<table class="table table-condensed {{strategy.visibility}}">
+								<thead>
+									<tr>
+										<th>Option</th>
+										<th>Premium</th>
+										<th>Exec.</th>
+										<th>Operation</th>
+										<th>Amount</th>
+										<th>Value</th>
+										<th>%Stocks</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="operation in strategy.operations">
+										<td>{{operation.option}}</td>
+										<td class="text-center">{{operation.premium}}</td>
+										<td class="text-center">{{operation.priceExec}}</td>
+										<td>
+											<select class="form-control fieldInsideTable" ng-model="operation.operation" 
+												ng-options="op.value as op.operation for op in operationsList"
+												ng-change="strategyCtrl.updateChart()">
+										</td>
+										<td>
+											<input type="number" min="0" class="form-control fieldInsideTable" ng-model="operation.quantity" placeholder="Amount" size="4" step="100" ng-change="strategyCtrl.updateChart()">
+										</td>
+										<td class="text-right">{{operation.premium * operation.quantity | number : 2}}</td>
+										<td class="text-center">{{100 * operation.premium * operation.quantity 
+												/ (stockSelected.price * stockSelected.quantity) | number : 1}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
-				<div class="col-sm-9">
+				<div class="col-sm-7">
 					<div class="checkbox">
 						<label>
-							<input type="checkbox" ng-model="combineResultWithStock" ng-></input>
-							 Combine result [Option Strategy] + [Stock Value]
+							<input type="checkbox" ng-model="combineResultWithStock" 
+								ng-change="strategyCtrl.updateChart()"/>
+							 Combine result [Option Strategy] + [Stock Value] 
 						</label>
+						<input type="number" class="stepper" ng-model="stockValueSimulated"  ng-change="strategyCtrl.updateChart()" step="0.05">
 					</div>
-					<nvd3-line-chart
-				    	data="exampleData"
-				        id="exampleId"
-				        xAxisTickFormat="xAxisTickFormatFunction()"
-				        yAxisTickFormat="yAxisTickFormatFunction()"
-				        width="550"
-				        height="350"
-				        showXAxis="true"
-				        showYAxis="true">
-				        	<svg></svg>
-				    </nvd3-line-chart>
+					<nvd3 options="optionsChart" data="dataChart"></nvd3>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<script src="/jquery/jquery.min.js"></script>
-	<script src="/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

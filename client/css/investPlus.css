@@ -7,4 +7,16 @@ input.stepper {
 select.operacao {
     width: 70px;
     padding-left: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 24px;
+}
+
+.fieldInsideTable {
+    width: 60px;
+    padding-left: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 0px;
+    height: 24px;
 }

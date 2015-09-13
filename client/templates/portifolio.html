@@ -1,0 +1,44 @@
+<div class="container-fluid">
+	<div ng-controller="StrategyController as strategyCtrl">
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						Portfolio
+					</div>
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th class="text-center">Stock</th>
+								<th class="text-center">Price</th>
+								<th class="text-center">Quantity</th>
+								<th class="text-center">Value</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="stock in portfolio" class="{{stock.selected == true ? 'success' : ''}}"
+								ng-click="stock.selected = !stock.selected">
+								<td>{{stock.name}}</td>
+								<td class="text-center">{{stock.price}}</td>
+								<td class="text-right">{{stock.quantity | number}}</td>
+								<td class="text-right">{{stock.price * stock.quantity | number : 2}}</td>
+								<td>
+									<button type="button" class="btn btn-default" aria-label="Left Align">
+										<span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>
+									</button>
+								</td>
+							</tr>
+							<tr>
+								<td>Total</td>
+								<td></td>
+								<td></td>
+								<td>23,453.12</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

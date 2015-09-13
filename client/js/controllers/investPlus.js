@@ -1,5 +1,28 @@
+var app = angular.module('investPlusApp', ['ngRoute', 'nvd3']);
 
-var app = angular.module('investPlusApp', ['nvd3']);
+app.config(function($routeProvider){
+	$routeProvider.when('/', {
+		templateUrl: 'templates/home.html',
+		controller: 'HomeController'
+	})
+	.when('/strategies', {
+		templateUrl: 'templates/strategies.html',
+		controller: 'StrategyController'
+	})
+	.when('/portifolio', {
+		templateUrl: 'templates/portifolio.html',
+		controller: 'PortifolioController'
+	})
+	.otherwise({redirectTo: '/'});
+});
+
+app.controller('HomeController', function($scope){
+
+});
+
+app.controller('PortifolioController', function($scope){
+
+});
 
 app.controller('StrategyController', function($scope) {
 	var strategy = this;
@@ -158,25 +181,6 @@ app.controller('StrategyController', function($scope) {
 				$scope.strategyChartData.push({key: "strategy " + $scope.strategyChartData.length, values: dados, color: '#FF0000'});
 			}
 		}
-
-		 // return [
-   //              {
-   //                  values: sin,      //values - represents the array of {x,y} data points
-   //                  key: 'Sine Wave', //key  - the name of the series.
-   //                  color: '#ff7f0e'  //color - optional: choose your own line color.
-   //              },
-   //              {
-   //                  values: cos,
-   //                  key: 'Cosine Wave',
-   //                  color: '#2ca02c'
-   //              },
-   //              {
-   //                  values: sin2,
-   //                  key: 'Another sine wave',
-   //                  color: '#7777ff',
-   //                  area: true      //area - set to true if you want this line to turn into a filled area chart.
-   //              }
-   //          ];
 	}
 
 	var createCurveData = function(minVal, maxVal, referenceGain, operations) {
@@ -211,33 +215,3 @@ app.controller('StrategyController', function($scope) {
 	}
 
 });
-
-
-// angular.module('investPlusApp', [])
-//   .controller('StrategyController', function() {
-//     var todoList = this;
-//     todoList.todos = [
-//       {text:'learn angular', done:true},
-//       {text:'build an angular app', done:false}];
- 
-//     todoList.addTodo = function() {
-//       todoList.todos.push({text:todoList.todoText, done:false});
-//       todoList.todoText = '';
-//     };
- 
-//     todoList.remaining = function() {
-//       var count = 0;
-//       angular.forEach(todoList.todos, function(todo) {
-//         count += todo.done ? 0 : 1;
-//       });
-//       return count;
-//     };
- 
-//     todoList.archive = function() {
-//       var oldTodos = todoList.todos;
-//       todoList.todos = [];
-//       angular.forEach(oldTodos, function(todo) {
-//         if (!todo.done) todoList.todos.push(todo);
-//       });
-//     };
-//   });

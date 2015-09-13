@@ -3,151 +3,59 @@
 <head>
 	<meta charset="utf-8">
 	<title>Invest Plus</title>
+	<!-- DEPENDENCIES -->
 	<script src="/bower_components/angular/angular.js"></script>
-	<!--<script src="/angularjs-nvd3-directives/angularjs-nvd3-directives.js"></script>
-
-
-	<script type='text/javascript' src='/d3/d3.min.js'></script>
-	<script type='text/javascript' src='/angular-chart/angular-charts.min.js'></script>
-	<script type='text/javascript' src='/charts/Chart.js'></script>
-
-
-<script src="bower_components/d3/d3.js"></script>
-<script src="bower_components/nvd3/nv.d3.js"></script>
-<script src="bower_components/angular-nvd3/dist/angular-nvd3.js"></script>
-<link rel="stylesheet" href="bower_components/nvd3/nv.d3.css">
-
-	-->
+	<script src="/bower_components/angular-route/angular-route.js"></script>
 	<script src="/bower_components/d3/d3.js"></script>
 	<script src="/bower_components/nvd3/build/nv.d3.js"></script>
 	<script src="/bower_components/angular-nvd3/dist/angular-nvd3.js"></script>
 	<link rel="stylesheet" href="/bower_components/nvd3/build/nv.d3.css">
 	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<!-- APPLICATION -->
+	<script type="text/javascript" src="/js/controllers/investPlus.js"></script>
 
-	<script type="text/javascript" src="/js/controllers/strategy.js"></script>
 	<link rel="stylesheet" href="/css/investPlus.css">
 </head>
 <body>
-	<div class="container-fluid">
-		<div ng-controller="StrategyController as strategyCtrl">
-			<div class="row">
-				<div class="col-sm-3">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							Portfolio
-						</div>
-						<table class="table table-bordered table-hover">
-							<thead>
-								<tr>
-									<th class="text-center">Stock</th>
-									<th class="text-center">Price</th>
-									<th class="text-center">Quantity</th>
-									<th class="text-center">Value</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="stock in portfolio" class="{{stock.selected == true ? 'success' : ''}}"
-									ng-click="stock.selected = !stock.selected">
-									<td>{{stock.name}}</td>
-									<td class="text-center">{{stock.price}}</td>
-									<td class="text-center">{{stock.quantity}}</td>
-									<td class="text-right">{{stock.price * stock.quantity | number : 2}}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<div class="col-sm-8">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							Select Options...
-						</div>
-						<table class="table table-bordered table-condensed">
-							<thead>
-								<tr>
-									<th>Stock</th>
-									<th>Price</th>
-									<th>Exec Price</th>
-									<th>% Stock</th>
-									<th>% Exec</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="option in options" ng-click="option.selected = !option.selected"
-										class="{{option.selected == true ? 'success' : ''}}">
-									<td>{{option.name}}</td>
-									<td class="text-center">{{option.premium}}</td>
-									<td class="text-center">{{option.priceExec}}</td>
-									<td class="text-center">{{100 * option.premium / stockSelected.price | number:1}}</td>
-									<td class="text-center">{{100 * (option.priceExec - stockSelected.price) / stockSelected.price | number:1}}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<button type="button" class="btn btn-default" ng-click="strategyCtrl.createStrategy()">
-						<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Strategy...
-					</button>
-				</div>
-				<div class="col-sm-1">
-					
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-5 sidebar">
-					<div class="table" ng-repeat="strategy in strategies">
-						<div class="panel panel-default">
-							<div class="panel-heading" ng-click="strategyCtrl.toggleStrategy(strategy)">
-								Strategy: {{strategy.id}}
-							</div>
-							<table class="table table-condensed {{strategy.visibility}}">
-								<thead>
-									<tr>
-										<th>Option</th>
-										<th>Premium</th>
-										<th>Exec.</th>
-										<th>Operation</th>
-										<th>Amount</th>
-										<th>Value</th>
-										<th>%Stocks</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr ng-repeat="operation in strategy.operations">
-										<td>{{operation.option}}</td>
-										<td class="text-center">{{operation.premium}}</td>
-										<td class="text-center">{{operation.priceExec}}</td>
-										<td>
-											<select class="form-control fieldInsideTable" ng-model="operation.operation" 
-												ng-options="op.value as op.operation for op in operationsList"
-												ng-change="strategyCtrl.updateChart()">
-										</td>
-										<td>
-											<input type="number" min="0" class="form-control fieldInsideTable" ng-model="operation.quantity" placeholder="Amount" size="4" step="100" ng-change="strategyCtrl.updateChart()">
-										</td>
-										<td class="text-right">{{operation.premium * operation.quantity | number : 2}}</td>
-										<td class="text-center">{{100 * operation.premium * operation.quantity 
-												/ (stockSelected.price * stockSelected.quantity) | number : 1}}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-				<div class="col-sm-7">
-					<div class="checkbox">
-						<label>
-							<input type="checkbox" ng-model="combineResultWithStock" 
-								ng-change="strategyCtrl.updateChart()"/>
-							 Combine result [Option Strategy] + [Stock Value] 
-						</label>
-						<input type="number" class="stepper" ng-model="stockValueSimulated"  ng-change="strategyCtrl.updateChart()" step="0.05">
-					</div>
-					<nvd3 options="optionsChart" data="strategyChartData"></nvd3>
-				</div>
-			</div>
-		</div>
-	</div>
 
+
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#/">Invest Plus</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="#/portifolio">Portfolio <span class="sr-only">(current)</span></a></li>
+					<li><a href="#/strategies">Strategies</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#">Login</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Config <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#">Profile</a></li>
+							<li><a href="#">Default Parameters</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Import Data</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>
+
+
+	<div ng-view></div>
 	<script src="/bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 </body>

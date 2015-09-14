@@ -1,4 +1,5 @@
 var express 				= require('express'),
+	portfolio 				= require('./server/routes/portfolio'),
 	app 					= express();
 
 app.get('/', function(req, res) {
@@ -12,7 +13,7 @@ app.use('/css', express.static(__dirname + '/client/css'));
 //app.use('/js', express.static(__dirname + '/client/js'));
 
 //REST API
-// app.get('/api/meetups', meetupsController.list);
+app.get('/stocks/portfolio', portfolio.list);
 // app.post('/api/meetups', meetupsController.create);
 // app.get('/api/importTournaments', tournamentsController.importTournaments);
 // app.get('/api/tournaments', tournamentsController.list);

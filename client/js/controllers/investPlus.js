@@ -9,20 +9,49 @@ app.config(function($routeProvider){
 		templateUrl: 'templates/strategies.html',
 		controller: 'StrategyController'
 	})
-	.when('/portifolio', {
+	.when('/portfolio', {
 		templateUrl: 'templates/portifolio.html',
-		controller: 'PortifolioController'
+		controller: 'PortfolioController'
 	})
 	.otherwise({redirectTo: '/'});
 });
 
 app.controller('HomeController', function($scope){
 
+	$scope.portfolio = [
+		{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
+		{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
+	];
+
+	$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
+
 });
 
-app.controller('PortifolioController', function($scope){
+app.controller('PortfolioController', ['$scope', '$http', function($scope, $http) {
 
-});
+	// $http.get('stocks/portifolio.json').success(function(data) {
+		
+	// 	$scope.portfolio = data;
+	// 	// $scope.portfolio = [
+	// 	// 	{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
+	// 	// 	{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
+	// 	// ];
+	// });
+
+	$scope.portfolio = [
+		{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
+		{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
+	];
+
+	$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
+
+	this.getData = function(){
+		$http.get('/stocks/portfolio').success(function(data) {
+			$scope.portfolio = data;
+		});
+	}
+
+}]);
 
 app.controller('StrategyController', function($scope) {
 	var strategy = this;
@@ -79,13 +108,6 @@ app.controller('StrategyController', function($scope) {
 
 	$scope.strategyChartData = [ ];
 	$scope.strategyChartOptions = { /* JSON data */ };
-
-	$scope.portfolio = [
-		{id:1, name:'VALE5', price: 15.37, type: 'S', quantity: 1800, selected: true},
-		{id:1, name:'BOVA11', price: 42.58, type: 'S', quantity: 20, selected: false}
-	];
-
-	$scope.stockSelected = {name:'VALE5', price: 15.37, quantity: 1800};
 
 	$scope.options = [
 		{id:2, name:'VALEJ15', premium: 1.61, type: 'O', priceExec: 14.49, selected: false},

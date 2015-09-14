@@ -1,43 +1,54 @@
 <div class="container-fluid">
-	<div ng-controller="StrategyController as strategyCtrl">
+	<div ng-controller="PortfolioController as portfolioCtrl">
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-8">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						Portfolio
 					</div>
-					<table class="table table-bordered table-hover">
+					<table class="table table-bordered table-hover table-condensed">
 						<thead>
 							<tr>
 								<th class="text-center">Stock</th>
-								<th class="text-center">Price</th>
-								<th class="text-center">Quantity</th>
-								<th class="text-center">Value</th>
-								<th></th>
+								<th class="text-center">Units</th>
+								<th class="text-center">Purchase Price</th>
+								<th class="text-center">Current Price</th>
+								<th class="text-center">Purchase Value</th>
+								<th class="text-center">Current Value</th>
+								<th class="text-center">Gain Price</th>
+								<th class="text-center">Gain Value</th>
+								<th class="text-center">Gain %</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="stock in portfolio" class="{{stock.selected == true ? 'success' : ''}}"
-								ng-click="stock.selected = !stock.selected">
+							<tr ng-repeat="stock in portfolio">
 								<td>{{stock.name}}</td>
-								<td class="text-center">{{stock.price}}</td>
-								<td class="text-right">{{stock.quantity | number}}</td>
+								<td class="text-right">{{stock.quantity}}</td>
+								<td>{{stock.price}}</td>
+								<td>{{stock.price * Math.random()}}</td>
+								<td class="text-right">{{stock.quantity * Math.random() | number : 0}}</td>
 								<td class="text-right">{{stock.price * stock.quantity | number : 2}}</td>
-								<td>
-									<button type="button" class="btn btn-default" aria-label="Left Align">
-										<span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span>
-									</button>
-								</td>
+								<td class="text-right">{{stock.price * Math.random() * stock.quantity | number : 2}}</td>
+								<td class="text-right">{{Math.random() * 100 | number : 2}}</td>
+								<td class="text-right">{{Math.random() * 100 | number : 2}}</td>
 							</tr>
 							<tr>
 								<td>Total</td>
 								<td></td>
 								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
 								<td>23,453.12</td>
+								<td></td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
+				<button type="button" class="btn btn-default" ng-click="portfolioCtrl.getData()">
+					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Get Data...
+				</button>
 			</div>
 		</div>
 	</div>
